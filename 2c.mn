@@ -66,7 +66,7 @@ operation fst(A,P,B,C){
   // pra não perder o valor de P:
   2: do load(B,P,C) goto 3
 
-  3: if divBy2(B,C) then goto 4 else goto 6
+  3: if divBy2(B,C) then goto 4 else goto 0
   4: do div2(B,C) goto 5
   5: do inc A goto 3
 
@@ -76,20 +76,20 @@ operation fst(A,P,B,C){
   // P == 2^a (2b - 1)
 }
 
-
-
 // B:=snd(P) usando A,C (extrai o segundo componente do par)
 operation snd(B,P,A,C){
   1: do clear(A) goto 2
   2: do fst(A,P,B,C) goto 3
 
   3: dec B goto 4
-  4: div2(B, C)
+  4: do div2(B, C) goto 5
 
-  5: do clear(A)
+  5: do clear(A) goto 0
 
   // após essa operação:
+  // A := 0
   // B := b
+  // P == 2^a (2b - 1) 
 }
 
 

@@ -81,7 +81,7 @@ operation snd(B,P,A,C){
   1: do clear(A) goto 2
   2: do fst(A,P,B,C) goto 3
 
-  3: dec B goto 4
+  3: do dec B goto 4
   4: do div2(B, C) goto 5
 
   5: do clear(A) goto 0

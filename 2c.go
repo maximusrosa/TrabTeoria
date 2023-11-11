@@ -78,13 +78,13 @@ operation fst(A,P,B,C){
 
 // B:=snd(P) usando A,C (extrai o segundo componente do par)
 operation snd(B,P,A,C){
-  1: do clear(A) goto 2
-  2: do fst(A,P,B,C) goto 3
 
-  3: do dec B goto 4
-  4: do div2(B, C) goto 5
+  1: do fst(A,P,B,C) goto 2
 
-  5: do clear(A) goto 0
+  2: do dec B goto 3
+  3: do div2(B, C) goto 0
+
+  //4: do clear(A) goto 0
 
   // após essa operação:
   // A := 0
@@ -92,15 +92,50 @@ operation snd(B,P,A,C){
   // P == 2^a (2b - 1) 
 }
 
+operation decod(P, A, B, C){
+  // extrai o primeiro componente do par
+  1: do fst(A,P,B,C) goto 2  
+  // extrai o segundo  componente do par
+  2: do snd(B,P,A,C) goto 0
+}
+
+// A:=AxB usando C,D (multiplicação destrutiva)
+operation mult(A, B, C, D){
+
+// A = A x B
+//  C:=A;
+//  até C=0 faça 
+//     (A:= A+B usando D;
+//      C:=C-1)
+
+  1: do load(C, A) goto 2
+
+  2: do soma(A, B, D) goto 3
+  3: do dec C goto 4
+  4: if zero C then goto 0 else goto 2
+
+}
+
+operation foo(P, A, B, C){
+  1: do decod(P, A, B, C) goto 2
+
+  2: do inc A goto 3
+  3: do div2(B,C) goto 4
+
+  // Saída no registrador A
+  4: do mult(A, B, C, D) goto 0
+  
+}
 
 // Programa principal
 main {
-  // extrai o primeiro componente do par
-  1: do fst(A,X,C,D) goto 2  
-  // extrai o segundo  componente do par
-  //2: do snd(B,X,C,D) goto 3  
+  1: do decod(X, A, B, C) goto 2
 
-  // coloca em Y a soma dos dois componentes
-  3: do soma(Y,A) goto 4      
-  //4: do soma(Y,B) goto 0      
+  2: do inc A goto 3
+  3: do div2(B,C) goto 4
+
+  //1: do foo(X, A, B, C) goto 2
+  //2: load(Y, A) goto 0
+
+
 } 

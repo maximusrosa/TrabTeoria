@@ -56,7 +56,7 @@ test divBy2(A,C){
 }
 
 
-// codificação: P == 2^a (2b - 1)
+// codificação: P == 2^a (2b + 1)
 
 // A:=fst(P) usando B,C (extrai o primeiro componente do par)
 operation fst(A,P,B,C){
@@ -72,8 +72,8 @@ operation fst(A,P,B,C){
 
   // após essa operação:
   // A := a
-  // B := 2b -1
-  // P == 2^a (2b - 1)
+  // B := 2b + 1
+  // P == 2^a (2b + 1)
 }
 
 // B:=snd(P) usando A,C (extrai o segundo componente do par)
@@ -89,7 +89,7 @@ operation snd(B,P,A,C){
   // após essa operação:
   // A := 0
   // B := b
-  // P == 2^a (2b - 1) 
+  // P == 2^a (2b + 1) 
 }
 
 operation decod(P, A, B, C){
@@ -99,43 +99,78 @@ operation decod(P, A, B, C){
   2: do snd(B,P,A,C) goto 0
 }
 
-// A:=AxB usando C,D (multiplicação destrutiva)
-operation mult(A, B, C, D){
-
-// A = A x B
+// A:=Ax2 usando C (multiplicação por 2 destrutiva)
+operation multBy2(A, C){
 //  C:=A;
-//  até C=0 faça 
-//     (A:= A+B usando D;
-//      C:=C-1)
+//  até C=0 faça
+//    (C:=C-1;
+//    A:=A+1;
+//    A:=A+1)
 
   1: do load(C, A) goto 2
-
-  2: do soma(A, B, D) goto 3
+  2: if zero C then goto 0 else goto 3
   3: do dec C goto 4
-  4: if zero C then goto 0 else goto 2
-
+  4: do inc A goto 5
+  5: do inc A goto 2
 }
 
-operation foo(P, A, B, C){
-  1: do decod(P, A, B, C) goto 2
+// A:=2^b usando C (exponenciação destrutiva)
+operation exp2(A, B, C){
+// A := 1;
+// até B=0 faça
+// (A := A × 2 usando C;
+// B := B - 1)
 
+  1: do clear(A) goto 2
   2: do inc A goto 3
-  3: do div2(B,C) goto 4
-
-  // Saída no registrador A
-  4: do mult(A, B, C, D) goto 0
-  
+  3: if zero B then goto 0 else goto 4
+  4: do multBy2(A, C) goto 5
+  5: do dec B goto 3
 }
+
+// A := A × B usando C, D (multiplicação destrutiva)
+operation mult_reg(A, B, C, D){
+//C:=A;
+//até C=0 faça
+//(A:=A+B usando D;
+//C:=C-1)
+  1: do load(C, A) goto 2
+  2: if zero C then goto 0 else goto 3
+  3: do dec C goto 4
+  4: do soma(A, B, D) goto 2
+}
+
+operation cod(A, B, AUX, C){
+  // AUX := 2^A 
+  1: do exp2(AUX, A, C) goto 2
+
+  // B := B * 2
+  2: do multBy2(B, C) goto 3
+
+  // B := B + 1
+  3: do inc B goto 4
+
+  4: do mult_reg(AUX, B, C, D) goto 0
+}
+
+operation foo(X, Y, A, C){
+  // Z usado como registrador auxiliar
+  1: do load(Z, X, C) goto 2 
+
+  // X := X + 1
+  2: do inc X goto 3
+
+  // Z := Z / 2
+  3: do div2(Z, C) goto 4
+
+  4: do cod(X, Z, Y, C) goto 5
+  
+  5: do clear(Z) goto 0
+}
+
+
 
 // Programa principal
 main {
-  1: do decod(X, A, B, C) goto 2
-
-  2: do inc A goto 3
-  3: do div2(B,C) goto 4
-
-  //1: do foo(X, A, B, C) goto 2
-  //2: load(Y, A) goto 0
-
-
+  1: do foo(X, Y, A, C) goto 0
 } 

@@ -20,12 +20,13 @@ def foo(x):
 
 
 def main():
-    Y = foo(int(argv[1]))
-    print(f'foo({argv[1]}) = {Y}')
 
-    a, b = decod(Y)
-    print(f'decod({Y}) = ({a}, {b})')
+    if (len(argv) > 1):
+        Y = foo(int(argv[1]))
+        print(f'foo({argv[1]}) = {Y}')
 
+        a, b = decod(Y)
+        print(f'decod({Y}) = ({a}, {b})')
 
 
 if __name__ == '__main__':

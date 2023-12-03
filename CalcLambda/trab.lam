@@ -1,0 +1,105 @@
+let
+
+    true = \x y. x;
+    false = \x y. y;
+    
+    if = \b e1 e2. b e1 e2;
+
+    not = \b. b false true;
+    and = \b1 b2. if b1 b2 false;
+    or = \b1 b2. if b1 true b2;
+
+    zero = \f x. x; -- pode-se usar 0 por praticidade
+    um = \f x. f x; -- 1
+    dois = \f x. f (f x); -- 2
+
+    succ = \n. \A B. A (n A B);
+
+    add_noob = \n1 n2. n1 succ n2;
+    add = \n1 n2. \A B. n1 A (n2 A B);
+
+    mult_noob = \n1 n2. n1 (\x. add n2 x) 0;
+    mult = \m n. \p q. m (n p) q;
+
+    sqr = \x. mult x x;
+
+    -- n1^n2
+    exp  = \n1. \n2. n2 (\x. mult x n1) 1;
+
+    isZero = \n. n (\x. false) true;
+    isPos = \n. not (isZero n); 
+
+    pair = \a b. \c. c a b;
+    fst = \p. p true;
+    snd = \p. p false;
+
+    swap = \p. pair (snd p) (fst p);
+    shiftInc = \p. pair (snd p) (succ (snd p));
+ 
+    -- (pred n) calcula n-1 se n>0, n se n=0 
+    pred = \n. fst (n shiftInc (pair 0 0));
+
+    -- (sub a b) calcula a - b
+    sub = \a b. b pred a;
+
+    -- (menor a b) testa a < b
+    menor = \a b. isPos (sub b a);
+ 
+    Y = \f. (\x. f (x x)) (\x. f (x x));
+
+    S_fat = \R. \n. if (isZero n) 1 (mult n (R (pred n)));
+
+    fat = Y S_fat;
+
+
+    -- (div a b) = 1 + div (a - b) b
+    div = Y \R . \a b. if (menor a b) 0 (succ (R (sub a b) b));
+
+    empty = \x. true;
+    cons = pair;
+
+    isEmpty = \l. l (\a b. false);
+    head = fst;
+    tail = snd;
+
+    lmult = Y \R. \l. if (isEmpty l) 1 (mult (head l) (R (tail l)));
+
+    somaPar = \p. add (fst p) (snd p);
+
+    somaParFibErrada = \p. pair ((snd p) (add (fst p) (snd p))); -- não tá funcionando
+
+    somaParFib = \p. (pair (fst (swap p)) (somaPar p));
+
+-- “Não dá pra tetudo…” Jacaré Anônimo.¯\_(ツ)_/¯  
+
+-- a) 
+    polinomio = \a b. (add (sqr a) (mult 3 b));
+
+-- b)
+    igual = \a b. if (or (menor a b) (menor b a)) false true;
+
+-- c)
+    -- (maior a b) testa a > b
+    maior = \a b. if (not (or (menor a b) (igual a b))) true false;
+
+    -- (maior_ou_igual a b) testa a >= b
+    maior_ou_igual = \a b. if (or (maior a b) (igual a b)) true false;
+
+    mod4 = Y \R. \n. if (maior_ou_igual n 4) (R (sub n 4)) n;
+
+    multQuatro = \n. if (isZero (mod4 n)) true false;
+
+-- d)
+    invFrac = \p. if (isPos (fst p)) (div (snd p) (fst p)) (div (fst p) (snd p));
+
+-- g)
+    fib = \m. fst (m (somaParFib (pair 0 1))); -- sempre dá 1
+
+
+in
+
+    multQuatro 10
+
+
+
+
